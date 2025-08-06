@@ -14,7 +14,13 @@ function App() {
       body: JSON.stringify({ email, password }),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        if (data.sucess === true) {
+          const token = data.token;
+          //vamos colocar no token no localStorage
+          localStorage.setItem("token", token);
+        }
+      });
   };
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 to-slate-600 text-white flex flex-col justify-center items-center gap-10">
