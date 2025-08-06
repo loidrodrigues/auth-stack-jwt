@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import jwt from "jsonwebtoken";
 
 const app = express();
 app.use(cors());
@@ -16,15 +17,16 @@ const users = [
   },
 ];
 
-app.post("/login", () => {
+app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = users.find(
     (user) => user.email === email && user.password === password
   );
   if (user) {
-    // aqui vamos o token com JWT
+    const token = jwt.sign({ email: user.email }, "PRIVATE_KEY");
+    res.json({ sucess: true, token: token });
   } else {
-    // aqui respondemos que o usuario nao foi autenticado
+    res.json({ sucess: false, message: "Usuário não autenticado!" });
   }
 });
 
