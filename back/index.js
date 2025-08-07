@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import { authmiddleware } from "./middlewares/authmiddleware.js";
 
 const app = express();
 app.use(cors());
@@ -23,7 +24,8 @@ const accounts = [
     username: "sandro",
   },
 ];
-const users = [
+
+global.users = [
   {
     username: "thiago",
     password: "123456",
@@ -48,41 +50,12 @@ app.post("/login", (req, res) => {
 });
 
 // verificacao de token
-app.get("/accounts", (req, res) => {
-  // pegando o token do header
-  const authHeader = req.headers.authorization;
-  if (authHeader) {
-    // separando o token do bearer
-    const token = authHeader.split(" ")[1];
-
-    try {
-      // decodificando o token
-      const decod = jwt.verify(token, "PRIVATE_KEY");
-      if (decod) {
-        const username = decod.username;
-        const persistUser = users.find((user) => user.username === username);
-        if (persistUser) {
-          const userAccount = accounts.filter(
-            (users) => users.username === persistUser.username
-          );
-          res.json(userAccount);
-        } else {
-          res.json({ sucess: false, message: "usuario nao encontrado!" });
-        }
-      } else {
-        res.json({
-          sucess: false,
-          message: "falha na decodificacao do token!",
-        });
-      }
-    } catch (error) {
-      res.json({ sucess: false, message: "o token foi mudado!" });
-    }
-  } else {
-    res
-      .status(401)
-      .json({ sucess: false, message: "sem o header de autenticacao" });
-  }
+app.get("/accounts", authmiddleware, (req, res) => {
+  const username = req.user.username;
+  const userAccouts = accounts.filter(
+    (account) => account.username === username
+  );
+  res.json(userAccouts);
 });
 
 app.listen("3000", () => console.log("Backend rodando na porta 3000!"));
