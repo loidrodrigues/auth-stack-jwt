@@ -1,4 +1,8 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function Home() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState([]);
   const handleAccount = () => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:3000/accounts", {
@@ -11,8 +15,11 @@ export default function Home() {
       .then((response) => response.json())
       .then((user) => {
         console.log(user);
+        setUser(user[0].username);
+        navigate("/account");
       });
   };
+
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 to-slate-600">
       <div className="w-full bg-white flex justify-between gap-10 p-4  px-8">
@@ -32,7 +39,7 @@ export default function Home() {
         </div>
       </div>
       <div className="h-full flex text-white justify-center items-center">
-        <h1>Seu espaço de trabalho</h1>
+        <h1>Seu espaço de trabalho {user}</h1>
       </div>
     </div>
   );
